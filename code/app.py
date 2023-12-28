@@ -88,6 +88,47 @@ def upload_file():
     # Redirigir a la página result.html con la predicción
     return render_template('results.html', prediction=y_pred.tolist())
 
+
+@app.route('/enviar_json_bc', methods=['POST'])
+def enviar_json_bc():
+    # Comprobar si la petición tiene los datos en formato JSON
+    if not request.is_json:
+        return jsonify({'error': 'No JSON object in the request.'}), 400
+
+    # Leer los datos del JSON
+    datos = request.get_json()
+
+    # Corregir los nombres de las características
+    for dic in datos:
+        if 'Precio (â‚¬)' in dic:
+            dic['Precio (€)'] = dic.pop('Precio (â‚¬)')
+        if 'Superficie (mÂ²)' in dic:
+            dic['Superficie (m²)'] = dic.pop('Superficie (mÂ²)')
+
+    # Validar los datos (aquí podrías agregar más validaciones)
+    if not isinstance(datos, list):
+        return jsonify({'error': 'Los datos deben ser una lista.'}), 400
+
+    # Convertir los datos a DataFrame
+    X = pd.DataFrame(datos)
+    X[num_cols] = estandarizador.transform(X[num_cols])
+    print(X.to_string(index=False))
+
+    # Hacer la predicción
+    try:
+        y_pred = modelo.predict(X)
+        y_pred_prob_nuevos = modelo.predict_proba(X)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    prediccion = 'Comprar' if y_pred[0] else 'No comprar'
+    # Probabilidad de la clase predicha
+    probabilidad = y_pred_prob_nuevos[0][int(y_pred[0])] * 100
+    print({'prediccion': prediccion, 'probabilidad': probabilidad})
+    print(y_pred)
+    # Redirigir a la página result.html con la predicción
+    return render_template('results.html', prediction=y_pred.tolist())
+
 # Crear una ruta para descargar el fichero generado
 
 
