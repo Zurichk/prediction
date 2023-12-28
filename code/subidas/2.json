@@ -1,0 +1,12 @@
+[
+    {
+        "Interes Turistico": 80,
+        "Superficie (m²)": 700,
+        "Precio (€)": 220000,
+        "Acceso a Transporte Publico": 1,
+        "Proximidad a Servicios (km)": 0.5,
+        "Zona Residencial": 1,
+        "Zona Comercial": 1,
+        "Indice de Criminalidad": 30
+    }
+]
