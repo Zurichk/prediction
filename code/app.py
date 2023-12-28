@@ -97,6 +97,7 @@ def enviar_json_bc():
 
     # Leer los datos del JSON
     datos = request.get_json()
+    print(datos)
 
     # Corregir los nombres de las características
     for dic in datos:
@@ -107,6 +108,7 @@ def enviar_json_bc():
 
     # Validar los datos (aquí podrías agregar más validaciones)
     if not isinstance(datos, list):
+        print({'error': 'Los datos deben ser una lista.'})
         return jsonify({'error': 'Los datos deben ser una lista.'}), 400
 
     # Convertir los datos a DataFrame
@@ -119,6 +121,7 @@ def enviar_json_bc():
         y_pred = modelo.predict(X)
         y_pred_prob_nuevos = modelo.predict_proba(X)
     except Exception as e:
+        print(str(e))
         return jsonify({'error': str(e)}), 500
 
     prediccion = 'Comprar' if y_pred[0] else 'No comprar'
@@ -126,8 +129,8 @@ def enviar_json_bc():
     probabilidad = y_pred_prob_nuevos[0][int(y_pred[0])] * 100
     print({'prediccion': prediccion, 'probabilidad': probabilidad})
     print(y_pred)
-    # Redirigir a la página result.html con la predicción
-    return render_template('results.html', prediction=y_pred.tolist())
+    # Devolver un texto con el resultado de la predicción
+    return jsonify({'prediccion': prediccion, 'probabilidad': probabilidad})
 
 # Crear una ruta para descargar el fichero generado
 
